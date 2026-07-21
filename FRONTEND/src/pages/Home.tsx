@@ -1,6 +1,6 @@
 import CardSlider from '../components/CardSlider';
 import MovieCard from '../components/MovieCard';
-
+import Carousel from '../components/Carousel';
 // 1. Array for Recommended Movies
 const recommendedMovies = [
   { id: 1, title: 'Kalki 2898 AD', genre: 'Action/Sci-Fi/Thriller', img: 'https://placehold.co/400x600/1a1a1a/FFFFFF?text=Kalki\n2898+AD' },
@@ -33,8 +33,7 @@ export default function Home() {
     <div className="bg-gray-100 min-h-screen pb-12">
       
       {/* 1. Main Banner Carousel (Placeholder) */}
-      <div className="w-full bg-gray-200 h-72 flex items-center justify-center mb-8">
-        <p className="text-gray-500 font-semibold">Carousel Banner Component</p>
+      <div> <Carousel />
       </div>
 
       {/* 2. Recommended Movies Section */}
