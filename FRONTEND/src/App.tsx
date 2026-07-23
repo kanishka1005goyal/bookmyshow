@@ -6,20 +6,20 @@ import Footer from './components/Footer';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      
-      {/* Main Content Area - flex-grow ensures the footer is pushed to the bottom */}
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/movie/:id" element={<MovieDetails />} />
-        </Routes>
-      </main>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navbar />
+        
+        {/* Main Content Area - flex-grow ensures the footer is pushed to the bottom */}
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/movie/:id" element={<MovieDetails />} />
+          </Routes>
+        </main>
 
-      <Footer />
-    </div>
-  )
+        <Footer />
+      </div>
+  );
 }
 
 export default App;
