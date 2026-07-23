@@ -1,24 +1,18 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-// Wide banner placeholders
-const banners = [
-  "https://placehold.co/1440x300/2b3149/FFFFFF?text=Latest+Releases+This+Week",
-  "https://placehold.co/1440x300/8b0000/FFFFFF?text=Book+Your+Tickets+Now",
-  "https://placehold.co/1440x300/003366/FFFFFF?text=Exclusive+Bank+Offers+Available"
-];
+import mockData from '../data/mockData.json';
 
 export default function Carousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? banners.length - 1 : currentIndex - 1;
+    const newIndex = isFirstSlide ? mockData.carouselBanners.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
   };
 
   const nextSlide = () => {
-    const isLastSlide = currentIndex === banners.length - 1;
+    const isLastSlide = currentIndex === mockData.carouselBanners.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
@@ -33,7 +27,7 @@ export default function Carousel() {
     <div className="w-full bg-gray-200 py-2 relative group">
       <div className="max-w-7xl mx-auto h-[300px] relative">
         <div
-          style={{ backgroundImage: `url(${banners[currentIndex]})` }}
+          style={{ backgroundImage: `url(${mockData.carouselBanners[currentIndex]})` }}
           className="w-full h-full rounded-xl bg-center bg-cover transition-all duration-500 ease-in-out"
         ></div>
         
@@ -49,7 +43,7 @@ export default function Carousel() {
 
         {/* Indicator Dots */}
         <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-          {banners.map((_, slideIndex) => (
+          {mockData.carouselBanners.map((_, slideIndex) => (
             <div
               key={slideIndex}
               onClick={() => setCurrentIndex(slideIndex)}

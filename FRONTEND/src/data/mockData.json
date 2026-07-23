@@ -1,0 +1,28 @@
+{
+  "carouselBanners": [
+    "https://placehold.co/1440x300/2b3149/FFFFFF?text=Latest+Releases+This+Week",
+    "https://placehold.co/1440x300/8b0000/FFFFFF?text=Book+Your+Tickets+Now",
+    "https://placehold.co/1440x300/003366/FFFFFF?text=Exclusive+Bank+Offers+Available"
+  ],
+  "recommendedMovies": [
+    { "id": 1, "title": "Kalki 2898 AD", "genre": "Action/Sci-Fi/Thriller", "img": "https://placehold.co/400x600/1a1a1a/FFFFFF?text=Kalki\n2898+AD" },
+    { "id": 2, "title": "Deadpool & Wolverine", "genre": "Action/Comedy", "img": "https://placehold.co/400x600/8b0000/FFFFFF?text=Deadpool\n%26\nWolverine" },
+    { "id": 3, "title": "Despicable Me 4", "genre": "Animation/Comedy", "img": "https://placehold.co/400x600/fada5e/000000?text=Despicable\nMe+4" },
+    { "id": 4, "title": "Kill", "genre": "Action/Thriller", "img": "https://placehold.co/400x600/333333/FFFFFF?text=Kill" },
+    { "id": 5, "title": "Bad Newz", "genre": "Comedy", "img": "https://placehold.co/400x600/4a90e2/FFFFFF?text=Bad\nNewz" }
+  ],
+  "premiereMovies": [
+    { "id": 101, "title": "Longlegs", "genre": "English", "img": "https://placehold.co/400x600/540b0e/FFFFFF?text=Longlegs" },
+    { "id": 102, "title": "Twisters", "genre": "English", "img": "https://placehold.co/400x600/335c67/FFFFFF?text=Twisters" },
+    { "id": 103, "title": "Fly Me to the Moon", "genre": "English", "img": "https://placehold.co/400x600/e09f3e/FFFFFF?text=Fly+Me\nto+the\nMoon" },
+    { "id": 104, "title": "A Quiet Place: Day One", "genre": "English", "img": "https://placehold.co/400x600/1e2f23/FFFFFF?text=A+Quiet\nPlace" },
+    { "id": 105, "title": "Inside Out 2", "genre": "English", "img": "https://placehold.co/400x600/9e2a2b/FFFFFF?text=Inside\nOut+2" }
+  ],
+  "localEvents": [
+    { "id": 201, "title": "Gaurav Kapoor Live", "genre": "Comedy Shows", "img": "https://placehold.co/400x600/ff9f1c/000000?text=Gaurav\nKapoor" },
+    { "id": 202, "title": "Sunburn Arena ft. Alan Walker", "genre": "Music Festivals", "img": "https://placehold.co/400x600/2ec4b6/000000?text=Alan\nWalker" },
+    { "id": 203, "title": "Jo Bolta Hai Wohi Hota Hai", "genre": "Stand up Comedy", "img": "https://placehold.co/400x600/e71d36/FFFFFF?text=Harsh\nGujral" },
+    { "id": 204, "title": "Osho Meditation Camp", "genre": "Workshops", "img": "https://placehold.co/400x600/011627/FFFFFF?text=Osho\nCamp" },
+    { "id": 205, "title": "Rajputana FC vs Jaipur City", "genre": "Football", "img": "https://placehold.co/400x600/41ead4/000000?text=Football\nMatch" }
+  ]
+}
