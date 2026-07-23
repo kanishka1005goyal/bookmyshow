@@ -18,6 +18,7 @@ export default function Home() {
         {mockData.recommendedMovies.map((movie) => (
           <MovieCard 
             key={movie.id}
+            id={movie.id}
             title={movie.title}
             genre={movie.genre}
             imageSrc={movie.img}
@@ -30,6 +31,7 @@ export default function Home() {
         {mockData.premiereMovies.map((movie) => (
           <MovieCard 
             key={movie.id}
+            id={movie.id}
             title={movie.title}
             genre={movie.genre}
             imageSrc={movie.img}
@@ -42,6 +44,7 @@ export default function Home() {
         {mockData.localEvents.map((event) => (
           <MovieCard 
             key={event.id}
+            id={event.id}
             title={event.title}
             genre={event.genre} 
             imageSrc={event.img}
