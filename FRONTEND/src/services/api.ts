@@ -70,5 +70,16 @@ export const api = {
         }
       }, DELAY);
     });
-  }
+  },
+
+  // 6. Get theatres
+  getTheatres: () => {
+    console.log("🌐 [MOCK API] GET /api/theatres - Request sent...");
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("✅ [MOCK API] 200 OK - Returned theatre list");
+        resolve(mockData.theatres);
+      }, DELAY);
+    });
+  },
 };

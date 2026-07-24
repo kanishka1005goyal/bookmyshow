@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetails from './pages/MovieDetails';
+import BuyTickets from './pages/BuyTickets';
 import Footer from './components/Footer';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/movie/:id" element={<MovieDetails />} />
+            <Route path="/buytickets/:id" element={<BuyTickets />} />
           </Routes>
         </main>
 
