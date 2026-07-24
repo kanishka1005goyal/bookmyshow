@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams , useNavigate} from 'react-router-dom';
 import { api } from '../services/api';
 
 export default function MovieDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // State to handle the fetched data, loading UI, and errors
   const [movie, setMovie] = useState<any>(null);
@@ -94,9 +95,12 @@ export default function MovieDetails() {
             {movie.duration || 'TBA'} • <span className="text-white font-medium">{movie.genre}</span> • {movie.certification || 'U'} • {movie.releaseDate || 'Coming Soon'}
           </p>
 
-          <button className="mt-6 bg-pink-500 hover:bg-pink-600 transition-colors text-white font-semibold py-3 px-12 rounded-lg w-fit text-lg shadow-md">
-            Book tickets
-          </button>
+          <button 
+  onClick={() => navigate(`/buytickets/${id}`)}
+  className="mt-6 bg-pink-500 hover:bg-pink-600 transition-colors text-white font-semibold py-3 px-12 rounded-lg w-fit text-lg shadow-md"
+>
+  Book tickets
+</button>
         </div>
       </div>
 

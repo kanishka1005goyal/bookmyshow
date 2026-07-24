@@ -219,5 +219,22 @@
       "releaseDate": "28 Jul, 2026",
       "about": "Catch the high-octane action live from the stadium as the home team takes on their biggest rivals in this season's most anticipated match."
     }
+  ],
+  "theatres": [
+    {
+      "id": 1,
+      "name": "INOX: Crystal Palm, C-Scheme",
+      "showtimes": ["09:00 AM", "11:15 AM", "02:45 PM", "06:00 PM"]
+    },
+    {
+      "id": 2,
+      "name": "Cinepolis: Triton Mall",
+      "showtimes": ["10:30 AM", "01:15 PM", "04:30 PM", "08:15 PM", "10:30 PM"]
+    },
+    {
+      "id": 3,
+      "name": "Entertainment Paradise (EP)",
+      "showtimes": ["12:00 PM", "03:30 PM", "07:00 PM"]
+    }
   ]
 }
