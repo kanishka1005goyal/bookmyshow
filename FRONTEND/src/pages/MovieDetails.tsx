@@ -1,23 +1,49 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import mockData from '../data/mockData.json';
+import { api } from '../services/api';
 
 export default function MovieDetails() {
   const { id } = useParams();
 
-  // Combine all array categories
-  const allItems = [
-    ...(mockData.recommendedMovies || []),
-    ...(mockData.premiereMovies || []),
-    ...(mockData.localEvents || []),
-  ];
+  // State to handle the fetched data, loading UI, and errors
+  const [movie, setMovie] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Search through all items
-  const movie = allItems.find((item) => item.id === Number(id));
+  useEffect(() => {
+    const fetchMovieDetails = async () => {
+      setIsLoading(true);
+      setError('');
+      try {
+        // Calling our mock API service
+        const data = await api.getItemById(Number(id));
+        setMovie(data);
+      } catch (err) {
+        setError('Movie/Event not found!');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  if (!movie) {
+    if (id) {
+      fetchMovieDetails();
+    }
+  }, [id]);
+
+  // Render a loading screen while waiting for the promise to resolve
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
-        <h2 className="text-2xl font-bold text-gray-800">Movie/Event not found!</h2>
+        <h2 className="text-xl font-semibold text-gray-600">Loading details...</h2>
+      </div>
+    );
+  }
+
+  // Render an error if the ID doesn't exist in our mock API
+  if (error || !movie) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <h2 className="text-2xl font-bold text-gray-800">{error || 'Movie/Event not found!'}</h2>
       </div>
     );
   }
@@ -50,14 +76,14 @@ export default function MovieDetails() {
 
           <div className="flex flex-wrap gap-2">
             {/* Dynamically render formats */}
-            {movie.formats?.map((format, index) => (
+            {movie.formats?.map((format: string, index: number) => (
               <span key={index} className="bg-gray-100 text-gray-900 px-2 py-1 rounded text-xs font-semibold">
                 {format}
               </span>
             ))}
             
             {/* Dynamically render languages */}
-            {movie.languages?.map((language, index) => (
+            {movie.languages?.map((language: string, index: number) => (
               <span key={`lang-${index}`} className="bg-gray-100 text-gray-900 px-2 py-1 rounded text-xs font-semibold">
                 {language}
               </span>
