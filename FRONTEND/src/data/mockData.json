@@ -1,0 +1,240 @@
+{
+  "carouselBanners": [
+    "https://placehold.co/1440x300/2b3149/FFFFFF?text=Latest+Releases+This+Week",
+    "https://placehold.co/1440x300/8b0000/FFFFFF?text=Book+Your+Tickets+Now",
+    "https://placehold.co/1440x300/003366/FFFFFF?text=Exclusive+Bank+Offers+Available"
+  ],
+  "recommendedMovies": [
+    {
+      "id": 1,
+      "title": "Kalki 2898 AD",
+      "genre": "Action/Sci-Fi/Thriller",
+      "img": "https://placehold.co/400x600/1a1a1a/FFFFFF?text=Kalki+2898+AD",
+      "rating": "8.5/10",
+      "votes": "50K+",
+      "formats": ["2D", "3D", "IMAX"],
+      "languages": ["Hindi", "Telugu", "Tamil"],
+      "duration": "3h 1m",
+      "certification": "UA",
+      "releaseDate": "27 Jun, 2024",
+      "about": "A modern myth that seamlessly blends the epic Mahabharata with a dystopian sci-fi future."
+    },
+    {
+      "id": 2,
+      "title": "Deadpool & Wolverine",
+      "genre": "Action/Comedy",
+      "img": "https://placehold.co/400x600/8b0000/FFFFFF?text=Deadpool+%26+Wolverine",
+      "rating": "9.2/10",
+      "votes": "120K+",
+      "formats": ["2D", "3D", "IMAX 3D", "4DX"],
+      "languages": ["English", "Hindi", "Tamil", "Telugu"],
+      "duration": "2h 7m",
+      "certification": "A",
+      "releaseDate": "26 Jul, 2024",
+      "about": "Wolverine is recovering from his injuries when he crosses paths with the loudmouth Deadpool. They team up to defeat a common enemy."
+    },
+    {
+      "id": 3,
+      "title": "Despicable Me 4",
+      "genre": "Animation/Comedy",
+      "img": "https://placehold.co/400x600/fada5e/000000?text=Despicable+Me+4",
+      "rating": "8.1/10",
+      "votes": "30K+",
+      "formats": ["2D", "3D"],
+      "languages": ["English", "Hindi"],
+      "duration": "1h 35m",
+      "certification": "U",
+      "releaseDate": "05 Jul, 2024",
+      "about": "Gru, Lucy, Margo, Edith, and Agnes welcome a new member to the family, Gru Jr., who is intent on tormenting his dad."
+    },
+    {
+      "id": 4,
+      "title": "Kill",
+      "genre": "Action/Thriller",
+      "img": "https://placehold.co/400x600/333333/FFFFFF?text=Kill",
+      "rating": "8.8/10",
+      "votes": "40K+",
+      "formats": ["2D"],
+      "languages": ["Hindi"],
+      "duration": "1h 55m",
+      "certification": "A",
+      "releaseDate": "06 Jul, 2024",
+      "about": "A train journey to New Delhi turns into a combat battleground as a pair of commandos face off against an army of invading bandits."
+    },
+    {
+      "id": 5,
+      "title": "Bad Newz",
+      "genre": "Comedy",
+      "img": "https://placehold.co/400x600/4a90e2/FFFFFF?text=Bad+Newz",
+      "rating": "7.5/10",
+      "votes": "20K+",
+      "formats": ["2D"],
+      "languages": ["Hindi"],
+      "duration": "2h 22m",
+      "certification": "UA",
+      "releaseDate": "19 Jul, 2024",
+      "about": "A rare comedic situation arises when a woman realizes she is pregnant with twins from two different fathers."
+    }
+  ],
+  "premiereMovies": [
+    {
+      "id": 101,
+      "title": "Longlegs",
+      "genre": "Horror/Thriller",
+      "img": "https://placehold.co/400x600/540b0e/FFFFFF?text=Longlegs",
+      "rating": "7.8/10",
+      "votes": "15K+",
+      "formats": ["2D"],
+      "languages": ["English"],
+      "duration": "1h 41m",
+      "certification": "A",
+      "releaseDate": "12 Jul, 2024",
+      "about": "In pursuit of a serial killer, an FBI agent uncovers a series of occult clues that she must solve to end his terrifying killing spree."
+    },
+    {
+      "id": 102,
+      "title": "Twisters",
+      "genre": "Action/Adventure",
+      "img": "https://placehold.co/400x600/335c67/FFFFFF?text=Twisters",
+      "rating": "7.6/10",
+      "votes": "18K+",
+      "formats": ["2D", "4DX", "IMAX"],
+      "languages": ["English", "Hindi"],
+      "duration": "2h 2m",
+      "certification": "UA",
+      "releaseDate": "19 Jul, 2024",
+      "about": "An update to the 1996 film 'Twister', which centered on a pair of storm chasers who risk their lives in an attempt to test an experimental weather alert system."
+    },
+    {
+      "id": 103,
+      "title": "Fly Me to the Moon",
+      "genre": "Romance/Comedy",
+      "img": "https://placehold.co/400x600/e09f3e/FFFFFF?text=Fly+Me+to+the+Moon",
+      "rating": "7.2/10",
+      "votes": "10K+",
+      "formats": ["2D"],
+      "languages": ["English"],
+      "duration": "2h 12m",
+      "certification": "UA",
+      "releaseDate": "12 Jul, 2024",
+      "about": "Sparks fly in all directions as marketing maven Kelly Jones is brought in to fix NASA's public image during the historic Apollo 11 moon mission."
+    },
+    {
+      "id": 104,
+      "title": "A Quiet Place: Day One",
+      "genre": "Horror/Sci-Fi",
+      "img": "https://placehold.co/400x600/1e2f23/FFFFFF?text=A+Quiet+Place",
+      "rating": "7.9/10",
+      "votes": "25K+",
+      "formats": ["2D", "IMAX"],
+      "languages": ["English", "Hindi"],
+      "duration": "1h 40m",
+      "certification": "UA",
+      "releaseDate": "28 Jun, 2024",
+      "about": "Experience the day the world went quiet in this terrifying prequel set in New York City."
+    },
+    {
+      "id": 105,
+      "title": "Inside Out 2",
+      "genre": "Animation/Family",
+      "img": "https://placehold.co/400x600/9e2a2b/FFFFFF?text=Inside+Out+2",
+      "rating": "8.9/10",
+      "votes": "60K+",
+      "formats": ["2D", "3D"],
+      "languages": ["English", "Hindi"],
+      "duration": "1h 36m",
+      "certification": "U",
+      "releaseDate": "14 Jun, 2024",
+      "about": "Follow Riley into her teenage years as her emotions navigate a new set of complex feelings in Headquarters."
+    }
+  ],
+  "localEvents": [
+    {
+      "id": 201,
+      "title": "Sunburn Arena Ft. Alan Walker",
+      "genre": "Music/Concert",
+      "img": "https://placehold.co/400x600/2a9d8f/FFFFFF?text=Alan+Walker+Live",
+      "rating": "9.5/10",
+      "votes": "10K+",
+      "formats": ["Live"],
+      "languages": ["English"],
+      "duration": "4h 0m",
+      "certification": "15+",
+      "releaseDate": "23 Oct, 2026",
+      "about": "Catch the EDM sensation Alan Walker live in your city for an unforgettable night of music and magic."
+    },
+    {
+      "id": 202,
+      "title": "Zakir Khan - Live",
+      "genre": "Comedy/Stand-up",
+      "img": "https://placehold.co/400x600/ffb703/FFFFFF?text=Zakir+Khan+Live",
+      "rating": "9.8/10",
+      "votes": "45K+",
+      "formats": ["Live"],
+      "languages": ["Hindi"],
+      "duration": "2h 0m",
+      "certification": "16+",
+      "releaseDate": "15 Aug, 2026",
+      "about": "Get ready for a night full of laughter with Zakir Khan's latest special, full of relatable stories and punchlines."
+    },
+    {
+      "id": 203,
+      "title": "Swan Lake - International Ballet",
+      "genre": "Theatre/Dance",
+      "img": "https://placehold.co/400x600/5c2c16/FFFFFF?text=Swan+Lake",
+      "rating": "9.1/10",
+      "votes": "5K+",
+      "formats": ["Live Stage"],
+      "languages": ["Music"],
+      "duration": "2h 30m",
+      "certification": "U",
+      "releaseDate": "10 Sep, 2026",
+      "about": "Experience the timeless classic Swan Lake, performed live by an international touring ballet company with a full symphony orchestra."
+    },
+    {
+      "id": 204,
+      "title": "Resin Art Masterclass",
+      "genre": "Workshop/Activity",
+      "img": "https://placehold.co/400x600/8e24aa/FFFFFF?text=Resin+Art",
+      "rating": "4.8/5",
+      "votes": "850+",
+      "formats": ["Offline"],
+      "languages": ["English", "Hindi"],
+      "duration": "3h 0m",
+      "certification": "12+",
+      "releaseDate": "05 Aug, 2026",
+      "about": "Learn the mesmerizing art of resin pouring. All materials provided, and you get to take your masterpiece home!"
+    },
+    {
+      "id": 205,
+      "title": "Pro Kabaddi League: Panthers vs Bulls",
+      "genre": "Sports",
+      "img": "https://placehold.co/400x600/d81b60/FFFFFF?text=Pro+Kabaddi",
+      "rating": "9.4/10",
+      "votes": "22K+",
+      "formats": ["Stadium"],
+      "languages": ["Hindi", "English Commentary"],
+      "duration": "1h 30m",
+      "certification": "U",
+      "releaseDate": "28 Jul, 2026",
+      "about": "Catch the high-octane action live from the stadium as the home team takes on their biggest rivals in this season's most anticipated match."
+    }
+  ],
+  "theatres": [
+    {
+      "id": 1,
+      "name": "INOX: Crystal Palm, C-Scheme",
+      "showtimes": ["09:00 AM", "11:15 AM", "02:45 PM", "06:00 PM"]
+    },
+    {
+      "id": 2,
+      "name": "Cinepolis: Triton Mall",
+      "showtimes": ["10:30 AM", "01:15 PM", "04:30 PM", "08:15 PM", "10:30 PM"]
+    },
+    {
+      "id": 3,
+      "name": "Entertainment Paradise (EP)",
+      "showtimes": ["12:00 PM", "03:30 PM", "07:00 PM"]
+    }
+  ]
+}
