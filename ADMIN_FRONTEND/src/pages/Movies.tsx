@@ -1,19 +1,32 @@
 import { useEffect, useState } from "react";
 import { Film, Plus, Search, Trash2, X } from "lucide-react";
-import { getMovies, createMovie, deleteMovie, type Movie } from "../api/admin";
+import { getMovies, getMovieFilters, createMovie, deleteMovie, type Movie } from "../api/admin";
 import { ApiError } from "../api/client";
+
+type SortOption = "latest" | "oldest";
 
 export default function Movies() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [search, setSearch] = useState("");
+  const [genre, setGenre] = useState("");
+  const [year, setYear] = useState("");
+  const [sort, setSort] = useState<SortOption>("latest");
+  const [genreOptions, setGenreOptions] = useState<string[]>([]);
+  const [yearOptions, setYearOptions] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const load = (search?: string) => {
+  const load = (opts?: { search?: string; genre?: string; year?: string; sort?: SortOption }) => {
     setLoading(true);
     setError(null);
-    getMovies({ search, limit: 50 })
+    getMovies({
+      search: opts?.search,
+      genre: opts?.genre || undefined,
+      year: opts?.year ? Number(opts.year) : undefined,
+      sort: opts?.sort ?? sort,
+      limit: 50,
+    })
       .then((res) => setMovies(res.movies))
       .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load movies"))
       .finally(() => setLoading(false));
@@ -21,11 +34,34 @@ export default function Movies() {
 
   useEffect(() => {
     load();
+    getMovieFilters()
+      .then((res) => {
+        setGenreOptions(res.genres);
+        setYearOptions(res.years);
+      })
+      .catch(() => {
+        // filter dropdowns are a nice-to-have; ignore failures silently
+      });
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    load(search || undefined);
+    load({ search: search || undefined, genre, year, sort });
+  };
+
+  const handleGenreChange = (value: string) => {
+    setGenre(value);
+    load({ search: search || undefined, genre: value, year, sort });
+  };
+
+  const handleYearChange = (value: string) => {
+    setYear(value);
+    load({ search: search || undefined, genre, year: value, sort });
+  };
+
+  const handleSortChange = (value: SortOption) => {
+    setSort(value);
+    load({ search: search || undefined, genre, year, sort: value });
   };
 
   const handleDeactivate = async (id: string) => {
@@ -54,7 +90,7 @@ export default function Movies() {
         </button>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-6 flex gap-2">
+      <form onSubmit={handleSearch} className="mb-6 flex flex-wrap gap-2">
         <div className="relative flex-1 max-w-sm">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
@@ -64,6 +100,41 @@ export default function Movies() {
             className="w-full bg-[#12151c] border border-white/5 rounded-lg pl-9 pr-3 py-2.5 text-sm text-gray-200 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-red-500/50"
           />
         </div>
+
+        <select
+          value={genre}
+          onChange={(e) => handleGenreChange(e.target.value)}
+          className="bg-[#12151c] border border-white/5 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-red-500/50"
+        >
+          <option value="">All Genres</option>
+          {genreOptions.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={year}
+          onChange={(e) => handleYearChange(e.target.value)}
+          className="bg-[#12151c] border border-white/5 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-red-500/50"
+        >
+          <option value="">All Years</option>
+          {yearOptions.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={sort}
+          onChange={(e) => handleSortChange(e.target.value as SortOption)}
+          className="bg-[#12151c] border border-white/5 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-red-500/50"
+        >
+          <option value="latest">Latest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
       </form>
 
       {error && (
@@ -77,6 +148,7 @@ export default function Movies() {
           <thead>
             <tr className="border-b border-white/5 text-left text-xs text-gray-500 uppercase tracking-wide">
               <th className="px-5 py-3 font-medium">Title</th>
+              <th className="px-5 py-3 font-medium">Genre</th>
               <th className="px-5 py-3 font-medium">Language</th>
               <th className="px-5 py-3 font-medium">Duration</th>
               <th className="px-5 py-3 font-medium">Release Date</th>
@@ -88,14 +160,14 @@ export default function Movies() {
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td colSpan={6} className="px-5 py-4">
+                  <td colSpan={7} className="px-5 py-4">
                     <div className="h-4 bg-white/5 rounded w-full" />
                   </td>
                 </tr>
               ))
             ) : movies.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-10 text-center text-gray-500">
+                <td colSpan={7} className="px-5 py-10 text-center text-gray-500">
                   <Film size={24} className="mx-auto mb-2 opacity-50" />
                   No movies found
                 </td>
@@ -104,6 +176,9 @@ export default function Movies() {
               movies.map((movie) => (
                 <tr key={movie._id} className="hover:bg-white/[0.02]">
                   <td className="px-5 py-3 text-white font-medium">{movie.title}</td>
+                  <td className="px-5 py-3 text-gray-400">
+                    {movie.genres && movie.genres.length > 0 ? movie.genres.join(", ") : "—"}
+                  </td>
                   <td className="px-5 py-3 text-gray-400">{movie.language}</td>
                   <td className="px-5 py-3 text-gray-400">{movie.durationMins} min</td>
                   <td className="px-5 py-3 text-gray-400">
@@ -148,6 +223,7 @@ function AddMovieModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
+  const [genresInput, setGenresInput] = useState("");
   const [durationMins, setDurationMins] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [censorRating, setCensorRating] = useState<"U" | "U/A" | "A" | "S">("U/A");
@@ -168,11 +244,16 @@ function AddMovieModal({
     }
 
     try {
+      const genres = genresInput
+        .split(",")
+        .map((g) => g.trim())
+        .filter(Boolean);
+
       const res = await createMovie({
         title,
         description,
         language,
-        genres: [],
+        genres,
         durationMins: Number(durationMins),
         releaseDate,
         censorRating,
@@ -234,6 +315,14 @@ function AddMovieModal({
               />
             </Field>
           </div>
+          <Field label="Genres (comma separated)">
+            <input
+              value={genresInput}
+              onChange={(e) => setGenresInput(e.target.value)}
+              placeholder="Animation, Comedy"
+              className={inputCls}
+            />
+          </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Release Date">
               <input

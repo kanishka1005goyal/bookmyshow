@@ -85,18 +85,34 @@ export default function Dashboard() {
             <h2 className="font-medium text-white">Recent Bookings</h2>
           </div>
           <div className="p-5">
-            {loading ? (
-              <ListSkeleton />
-            ) : data && data.recentBookings.length > 0 ? (
-              <ul className="space-y-3 text-sm">
-                {/* Populated once the Booking model is implemented */}
-              </ul>
-            ) : (
-              <EmptyState
-                message="No bookings yet"
-                hint="Booking data will appear here once the booking module goes live."
-              />
-            )}
+         {loading ? (
+  <ListSkeleton />
+) : data && data.recentBookings.length > 0 ? (
+  <ul className="divide-y divide-white/5">
+    {data.recentBookings.map((booking) => {
+      const user = typeof booking.userId === "string" ? null : booking.userId;
+      const show = typeof booking.showId === "string" ? null : booking.showId;
+      const movie = show && typeof show.movieId !== "string" ? show.movieId : null;
+      return (
+        <li key={booking._id} className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm text-white truncate">{movie?.title ?? "Booking"}</p>
+            <p className="text-xs text-gray-500 truncate">{user?.name ?? "—"}</p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-sm text-white">{inr(booking.totalAmount)}</p>
+            <p className="text-xs text-gray-500">{booking.status.replace("_", " ")}</p>
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+) : (
+  <EmptyState
+    message="No bookings yet"
+    hint="Booking data will appear here once the booking module goes live."
+  />
+)}
           </div>
         </section>
 

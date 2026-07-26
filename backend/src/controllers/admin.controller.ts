@@ -27,11 +27,14 @@ export const getDashboard = async (req: Request, res: Response) => {
     const recentMovies = await Movie.find()
       .sort({ createdAt: -1 })
       .limit(5);
-
-    const recentBookings = await Booking.find()
-      .sort({ createdAt: -1 })
-      .limit(5);
-
+const recentBookings = await Booking.find()
+  .populate({ path: "userId", select: "name email" })
+  .populate({
+    path: "showId",
+    populate: [{ path: "movieId", select: "title posterUrl" }],
+  })
+  .sort({ createdAt: -1 })
+  .limit(5);
     // Revenue (change this field if your Booking model uses another name)
     const revenueResult = await Booking.aggregate([
       {
@@ -63,6 +66,90 @@ export const getDashboard = async (req: Request, res: Response) => {
 
     res.status(500).json({
       message: "Failed to load dashboard",
+    });
+  }
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const { search, page = "1", limit = "20" } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit as string, 10) || 20);
+
+    const filter: Record<string, unknown> = {};
+    if (search) {
+      const regex = new RegExp(String(search), "i");
+      filter.$or = [{ name: regex }, { email: regex }];
+    }
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
+      User.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      users,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to load users",
+    });
+  }
+};
+
+export const getAllBookings = async (req: Request, res: Response) => {
+  try {
+    const { status, page = "1", limit = "20" } = req.query;
+
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.max(1, parseInt(limit as string, 10) || 20);
+
+    const filter: Record<string, unknown> = {};
+    if (status) {
+      filter.status = status;
+    }
+
+    const [bookings, total] = await Promise.all([
+      Booking.find(filter)
+        .populate({ path: "userId", select: "name email" })
+        .populate({
+          path: "showId",
+          populate: [
+            { path: "movieId", select: "title posterUrl" },
+            { path: "theatreId", select: "name city" },
+          ],
+        })
+        .sort({ createdAt: -1 })
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
+      Booking.countDocuments(filter),
+    ]);
+
+    res.status(200).json({
+      bookings,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to load bookings",
     });
   }
 };

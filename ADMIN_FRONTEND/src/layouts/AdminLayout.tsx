@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Film, Building2, Tv, Clock3, LayoutGrid, LogOut, Clapperboard } from "lucide-react";
+import { LayoutDashboard, Film, Building2, Tv, Clock3, LayoutGrid, LogOut, Clapperboard, Ticket, Users } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 const navItems = [
@@ -9,6 +9,8 @@ const navItems = [
   { to: "/screens", label: "Screens", icon: Tv, end: false },
   { to: "/shows", label: "Shows", icon: Clock3, end: false },
   { to: "/seats", label: "Seat Layout", icon: LayoutGrid, end: false },
+  { to: "/bookings", label: "Bookings", icon: Ticket, end: false },
+  { to: "/users", label: "Users", icon: Users, end: false },
 ];
 
 export default function AdminLayout() {

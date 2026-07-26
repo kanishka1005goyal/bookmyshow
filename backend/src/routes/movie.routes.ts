@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getMovies,
   getMovieById,
+  getMovieFilters,  
   createMovie,
   updateMovie,
   deleteMovie,
@@ -15,6 +16,7 @@ const router = Router();
 
 // Public
 router.get("/", getMovies);
+router.get("/meta/filters", getMovieFilters);
 router.get("/:id", getMovieById);
 
 // Admin only

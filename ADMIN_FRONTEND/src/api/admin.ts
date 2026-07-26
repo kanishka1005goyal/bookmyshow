@@ -49,16 +49,31 @@ export interface DashboardResponse {
 
 export const getDashboard = () => apiFetch<DashboardResponse>("/admin/dashboard");
 
-export const getMovies = (params: { page?: number; limit?: number; search?: string } = {}) => {
+export const getMovies = (
+  params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    genre?: string;
+    year?: number;
+    sort?: "latest" | "oldest";
+  } = {}
+) => {
   const qs = new URLSearchParams();
   if (params.page) qs.set("page", String(params.page));
   if (params.limit) qs.set("limit", String(params.limit));
   if (params.search) qs.set("search", params.search);
+  if (params.genre) qs.set("genre", params.genre);
+  if (params.year) qs.set("year", String(params.year));
+  if (params.sort) qs.set("sort", params.sort);
   const suffix = qs.toString() ? `?${qs.toString()}` : "";
   return apiFetch<{ movies: Movie[]; pagination: { page: number; limit: number; total: number } }>(
     `/movies${suffix}`
   );
 };
+
+export const getMovieFilters = () =>
+  apiFetch<{ genres: string[]; years: number[] }>("/movies/meta/filters");
 
 export type CreateMoviePayload = Omit<Movie, "_id" | "isActive" | "createdAt">;
 
@@ -111,7 +126,53 @@ export interface Screen {
   totalSeats: number;
   isActive: boolean;
 }
+export interface Booking {
+  _id: string;
+  userId: { _id: string; name: string; email: string } | string;
+  showId: {
+    _id: string;
+    movieId: { _id: string; title: string; posterUrl?: string } | string;
+    theatreId: { _id: string; name: string; city: string } | string;
+    startTime: string;
+  } | string;
+  seats: { seatId: string; label: string; price: number }[];
+  totalAmount: number;
+  status: "PENDING_PAYMENT" | "CONFIRMED" | "CANCELLED" | "EXPIRED";
+  createdAt: string;
+}
 
+export const getAllBookings = (
+  params: { status?: Booking["status"]; page?: number; limit?: number } = {}
+) => {
+  const qs = new URLSearchParams();
+  if (params.status) qs.set("status", params.status);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.limit) qs.set("limit", String(params.limit));
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return apiFetch<{ bookings: Booking[]; pagination: { page: number; limit: number; total: number } }>(
+    `/admin/bookings${suffix}`
+  );
+};
+
+export interface AdminUserRecord {
+  _id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin";
+  clerkId?: string;
+  createdAt: string;
+}
+
+export const getAllUsers = (params: { search?: string; page?: number; limit?: number } = {}) => {
+  const qs = new URLSearchParams();
+  if (params.search) qs.set("search", params.search);
+  if (params.page) qs.set("page", String(params.page));
+  if (params.limit) qs.set("limit", String(params.limit));
+  const suffix = qs.toString() ? `?${qs.toString()}` : "";
+  return apiFetch<{ users: AdminUserRecord[]; pagination: { page: number; limit: number; total: number } }>(
+    `/admin/users${suffix}`
+  );
+};
 export const getScreensByTheatre = (theatreId: string) =>
   apiFetch<{ screens: Screen[] }>(`/screens/theatre/${theatreId}`);
 

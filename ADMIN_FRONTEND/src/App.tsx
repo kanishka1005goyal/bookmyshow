@@ -9,6 +9,8 @@ import Theatres from "./pages/Theatres";
 import Screens from "./pages/Screens";
 import Shows from "./pages/Shows";
 import Seats from "./pages/Seats";
+import Bookings from "./pages/Bookings";
+import Users from "./pages/Users";
 
 export default function App() {
   return (
@@ -29,6 +31,8 @@ export default function App() {
           <Route path="screens" element={<Screens />} />
           <Route path="shows" element={<Shows />} />
           <Route path="seats" element={<Seats />} />
+          <Route path="bookings" element={<Bookings />} />
+          <Route path="users" element={<Users />} />
         </Route>
       </Routes>
     </AuthProvider>
