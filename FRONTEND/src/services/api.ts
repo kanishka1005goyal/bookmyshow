@@ -30,6 +30,27 @@ export const api = {
     }
   },
 
+  // Add this inside the export const api = { ... } block
+  getMovieById: async (id: string) => {
+    try {
+      console.log(`🌐 [REAL API] GET fetching movie details for ID: ${id}...`);
+      const response = await fetch(`${API_BASE_URL}/movies/${id}`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned movie details:", data);
+      
+      // The backend will return a single movie object, so we return it directly
+      return data.movie || data.data || data;; 
+      
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return null; 
+    }
+  },
   // 2. Get all premiere movies
   getPremiereMovies: () => {
     console.log("🌐 [MOCK API] GET /api/movies/premieres - Request sent...");
