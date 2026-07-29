@@ -109,13 +109,78 @@ export const api = {
   },
 
   // 6. Get theatres
-  getTheatres: () => {
-    console.log("🌐 [MOCK API] GET /api/theatres - Request sent...");
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("✅ [MOCK API] 200 OK - Returned theatre list");
-        resolve(mockData.theatres);
-      }, DELAY);
-    });
+getTheatres: async () => {
+    try {
+      console.log(`🌐 [REAL API] GET fetching theaters...`);
+      // Make sure this matches your backend route (e.g., /api/theatres)
+      const response = await fetch(`${API_BASE_URL}/theatres`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned theaters:", data);
+      
+      // Extract the array from your backend's res.status(200).json({ theatres, ... })
+      const realTheatres = data.theatres || []; 
+      
+      // TEMPORARY FIX: Inject mock showtimes into the real database theaters
+      // We also map MongoDB's '_id' to 'id' so your React keys don't break
+      const theatresWithShowtimes = realTheatres.map((theatre: any) => ({
+        ...theatre,
+        id: theatre._id, 
+        showtimes: ["09:00 AM", "12:30 PM", "04:15 PM", "08:00 PM"] // Temporary fallback
+      }));
+
+      return theatresWithShowtimes;
+      
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return []; 
+    }
   },
-};
+
+  // Add this inside your export const api = { ... }
+ getSeatMap: async (showId: string) => {
+    try {
+      console.log(`🌐 [REAL API] Fetching seat map for show: ${showId}`);
+      
+      // 🔥 THE FIX: Changed /map/ to /show/ to perfectly match your Express router
+      const response = await fetch(`${API_BASE_URL}/seats/show/${showId}`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned seat map:", data);
+      
+      // Your backend returns { showId: '...', seats: [...] }
+      return data.seats || []; 
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return []; 
+    }
+  },
+  // Add this inside export const api = { ... }
+  getShowsByMovie: async (movieId: string, dateStr: string) => {
+    try {
+      console.log(`🌐 [REAL API] Fetching shows for movie ${movieId} on ${dateStr}`);
+      // Assuming your route is set up as /api/shows/movie/:movieId
+      const response = await fetch(`${API_BASE_URL}/shows/movie/${movieId}?date=${dateStr}`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned shows:", data);
+      
+      return data.shows || []; 
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return []; 
+    }
+  },
+}

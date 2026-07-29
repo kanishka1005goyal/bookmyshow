@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetails from './pages/MovieDetails';
 import BuyTickets from './pages/BuyTickets';
+import SeatLayout from './pages/SeatLayout';
 import Footer from './components/Footer';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/movie/:id" element={<MovieDetails />} />
             <Route path="/buytickets/:id" element={<BuyTickets />} />
+            <Route path="/seatlayout" element={<SeatLayout />} />
           </Routes>
         </main>
 
