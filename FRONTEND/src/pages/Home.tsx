@@ -60,15 +60,17 @@ export default function Home() {
 
       {/* 2. Recommended Movies Section */}
       <CardSlider title="Recommended Movies">
-        {recommendedMovies.map((movie) => (
-          <MovieCard 
-            key={movie.id}
-            id={movie.id}
-            title={movie.title}
-            genre={movie.genre}
-            imageSrc={movie.img}
-          />
-        ))}
+    {recommendedMovies.map((movie: any) => (
+  <MovieCard 
+    key={movie._id} 
+    id={movie._id} 
+    // Use the backend posterUrl, OR a web placeholder if it's missing
+    imageSrc={movie.posterUrl || "https://placehold.co/400x600?text=No+Poster"} 
+    title={movie.title}                           
+    // If the genres array is empty, show a fallback string
+    genre={movie.genres?.length > 0 ? movie.genres.join(', ') : "Genre not specified"} 
+  />
+))}
       </CardSlider>
 
       {/* 3. Stream / Premiere Section (Dark Theme) */}
