@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 interface MovieProps {
-  id: number;
+  id: string; // <-- Changed from number to string for MongoDB _id
   imageSrc: string;
   title: string;
   genre: string;
