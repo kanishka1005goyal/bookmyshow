@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import { Building2, Plus, Search, Trash2, X } from "lucide-react";
-import { getTheatres, createTheatre, deleteTheatre, type Theatre } from "../api/admin";
+import { Building2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  getTheatres,
+  createTheatre,
+  updateTheatre,
+  deleteTheatre,
+  type Theatre,
+} from "../api/admin";
 import { ApiError } from "../api/client";
 
 export default function Theatres() {
@@ -9,6 +15,7 @@ export default function Theatres() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingTheatre, setEditingTheatre] = useState<Theatre | null>(null);
 
   const load = (city?: string) => {
     setLoading(true);
@@ -107,13 +114,22 @@ export default function Theatres() {
                   <td className="px-5 py-3 text-gray-400">{theatre.address}</td>
                   <td className="px-5 py-3 text-gray-400">{theatre.amenities.join(", ") || "—"}</td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleDeactivate(theatre._id)}
-                      className="text-gray-500 hover:text-red-400 transition-colors"
-                      title="Deactivate"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => setEditingTheatre(theatre)}
+                        className="text-gray-500 hover:text-gray-200 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeactivate(theatre._id)}
+                        className="text-gray-500 hover:text-red-400 transition-colors"
+                        title="Deactivate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -123,11 +139,22 @@ export default function Theatres() {
       </div>
 
       {showForm && (
-        <AddTheatreModal
+        <TheatreFormModal
           onClose={() => setShowForm(false)}
-          onCreated={(theatre) => {
+          onSaved={(theatre) => {
             setTheatres((prev) => [theatre, ...prev]);
             setShowForm(false);
+          }}
+        />
+      )}
+
+      {editingTheatre && (
+        <TheatreFormModal
+          theatre={editingTheatre}
+          onClose={() => setEditingTheatre(null)}
+          onSaved={(theatre) => {
+            setTheatres((prev) => prev.map((t) => (t._id === theatre._id ? theatre : t)));
+            setEditingTheatre(null);
           }}
         />
       )}
@@ -135,17 +162,20 @@ export default function Theatres() {
   );
 }
 
-function AddTheatreModal({
+function TheatreFormModal({
+  theatre,
   onClose,
-  onCreated,
+  onSaved,
 }: {
+  theatre?: Theatre;
   onClose: () => void;
-  onCreated: (theatre: Theatre) => void;
+  onSaved: (theatre: Theatre) => void;
 }) {
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
-  const [amenities, setAmenities] = useState("");
+  const isEdit = Boolean(theatre);
+  const [name, setName] = useState(theatre?.name ?? "");
+  const [city, setCity] = useState(theatre?.city ?? "");
+  const [address, setAddress] = useState(theatre?.address ?? "");
+  const [amenities, setAmenities] = useState(theatre?.amenities?.join(", ") ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,7 +184,7 @@ function AddTheatreModal({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await createTheatre({
+      const payload = {
         name,
         city,
         address,
@@ -162,10 +192,13 @@ function AddTheatreModal({
           .split(",")
           .map((a) => a.trim())
           .filter(Boolean),
-      });
-      onCreated(res.theatre);
+      };
+      const res = isEdit
+        ? await updateTheatre(theatre!._id, payload)
+        : await createTheatre(payload);
+      onSaved(res.theatre);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to create theatre");
+      setError(err instanceof ApiError ? err.message : `Failed to ${isEdit ? "update" : "create"} theatre`);
     } finally {
       setSubmitting(false);
     }
@@ -175,7 +208,7 @@ function AddTheatreModal({
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-[#12151c] border border-white/10 rounded-xl w-full max-w-md">
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <h2 className="font-medium text-white">Add Theatre</h2>
+          <h2 className="font-medium text-white">{isEdit ? "Edit Theatre" : "Add Theatre"}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
             <X size={18} />
           </button>
@@ -214,7 +247,7 @@ function AddTheatreModal({
             disabled={submitting}
             className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
           >
-            {submitting ? "Saving..." : "Save Theatre"}
+            {submitting ? "Saving..." : isEdit ? "Update Theatre" : "Save Theatre"}
           </button>
         </form>
       </div>

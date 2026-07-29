@@ -83,6 +83,12 @@ export const createMovie = (payload: CreateMoviePayload) =>
     body: JSON.stringify(payload),
   });
 
+export const updateMovie = (id: string, payload: Partial<CreateMoviePayload>) =>
+  apiFetch<{ movie: Movie }>(`/movies/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+
 export const deleteMovie = (id: string) =>
   apiFetch<{ message: string }>(`/movies/${id}`, { method: "DELETE" });
 
@@ -112,6 +118,12 @@ export type CreateTheatrePayload = Omit<Theatre, "_id" | "isActive" | "createdAt
 export const createTheatre = (payload: CreateTheatrePayload) =>
   apiFetch<{ theatre: Theatre }>("/theatres", {
     method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const updateTheatre = (id: string, payload: Partial<CreateTheatrePayload>) =>
+  apiFetch<{ theatre: Theatre }>(`/theatres/${id}`, {
+    method: "PUT",
     body: JSON.stringify(payload),
   });
 
@@ -184,6 +196,12 @@ export const createScreen = (payload: CreateScreenPayload) =>
     body: JSON.stringify(payload),
   });
 
+export const updateScreen = (id: string, payload: Partial<CreateScreenPayload>) =>
+  apiFetch<{ screen: Screen }>(`/screens/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+
 export const deleteScreen = (id: string) =>
   apiFetch<{ message: string }>(`/screens/${id}`, { method: "DELETE" });
 
@@ -224,6 +242,12 @@ export interface CreateShowPayload {
 export const createShow = (payload: CreateShowPayload) =>
   apiFetch<{ show: Show }>("/shows", {
     method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const updateShow = (id: string, payload: Partial<CreateShowPayload>) =>
+  apiFetch<{ show: Show }>(`/shows/${id}`, {
+    method: "PUT",
     body: JSON.stringify(payload),
   });
 

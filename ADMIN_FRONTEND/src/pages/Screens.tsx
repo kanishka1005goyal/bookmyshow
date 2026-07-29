@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Tv, Plus, Trash2, X } from "lucide-react";
+import { Tv, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   getTheatres,
   getScreensByTheatre,
   createScreen,
+  updateScreen,
   deleteScreen,
   type Theatre,
   type Screen,
@@ -18,6 +19,7 @@ export default function Screens() {
   const [loadingScreens, setLoadingScreens] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingScreen, setEditingScreen] = useState<Screen | null>(null);
 
   // Load the theatre list once, then default-select the first one.
   useEffect(() => {
@@ -131,13 +133,22 @@ export default function Screens() {
                   <td className="px-5 py-3 text-gray-400">{screen.screenType}</td>
                   <td className="px-5 py-3 text-gray-400">{screen.totalSeats}</td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleDeactivate(screen._id)}
-                      className="text-gray-500 hover:text-red-400 transition-colors"
-                      title="Deactivate"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => setEditingScreen(screen)}
+                        className="text-gray-500 hover:text-gray-200 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeactivate(screen._id)}
+                        className="text-gray-500 hover:text-red-400 transition-colors"
+                        title="Deactivate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -147,12 +158,24 @@ export default function Screens() {
       </div>
 
       {showForm && (
-        <AddScreenModal
+        <ScreenFormModal
           theatreId={theatreId}
           onClose={() => setShowForm(false)}
-          onCreated={(screen) => {
+          onSaved={(screen) => {
             setScreens((prev) => [screen, ...prev]);
             setShowForm(false);
+          }}
+        />
+      )}
+
+      {editingScreen && (
+        <ScreenFormModal
+          theatreId={theatreId}
+          screen={editingScreen}
+          onClose={() => setEditingScreen(null)}
+          onSaved={(screen) => {
+            setScreens((prev) => prev.map((s) => (s._id === screen._id ? screen : s)));
+            setEditingScreen(null);
           }}
         />
       )}
@@ -160,17 +183,20 @@ export default function Screens() {
   );
 }
 
-function AddScreenModal({
+function ScreenFormModal({
   theatreId,
+  screen,
   onClose,
-  onCreated,
+  onSaved,
 }: {
   theatreId: string;
+  screen?: Screen;
   onClose: () => void;
-  onCreated: (screen: Screen) => void;
+  onSaved: (screen: Screen) => void;
 }) {
-  const [name, setName] = useState("");
-  const [screenType, setScreenType] = useState<Screen["screenType"]>("2D");
+  const isEdit = Boolean(screen);
+  const [name, setName] = useState(screen?.name ?? "");
+  const [screenType, setScreenType] = useState<Screen["screenType"]>(screen?.screenType ?? "2D");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -179,10 +205,12 @@ function AddScreenModal({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await createScreen({ theatreId, name, screenType });
-      onCreated(res.screen);
+      const res = isEdit
+        ? await updateScreen(screen!._id, { name, screenType })
+        : await createScreen({ theatreId, name, screenType });
+      onSaved(res.screen);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to create screen");
+      setError(err instanceof ApiError ? err.message : `Failed to ${isEdit ? "update" : "create"} screen`);
     } finally {
       setSubmitting(false);
     }
@@ -192,7 +220,7 @@ function AddScreenModal({
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-[#12151c] border border-white/10 rounded-xl w-full max-w-md">
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <h2 className="font-medium text-white">Add Screen</h2>
+          <h2 className="font-medium text-white">{isEdit ? "Edit Screen" : "Add Screen"}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
             <X size={18} />
           </button>
@@ -229,7 +257,7 @@ function AddScreenModal({
             disabled={submitting}
             className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
           >
-            {submitting ? "Saving..." : "Save Screen"}
+            {submitting ? "Saving..." : isEdit ? "Update Screen" : "Save Screen"}
           </button>
         </form>
       </div>

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
-import { Film, Plus, Search, Trash2, X } from "lucide-react";
-import { getMovies, getMovieFilters, createMovie, deleteMovie, type Movie } from "../api/admin";
+import { Film, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  getMovies,
+  getMovieFilters,
+  createMovie,
+  updateMovie,
+  deleteMovie,
+  type Movie,
+} from "../api/admin";
 import { ApiError } from "../api/client";
 
 type SortOption = "latest" | "oldest";
@@ -16,6 +23,7 @@ export default function Movies() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
 
   const load = (opts?: { search?: string; genre?: string; year?: string; sort?: SortOption }) => {
     setLoading(true);
@@ -175,7 +183,25 @@ export default function Movies() {
             ) : (
               movies.map((movie) => (
                 <tr key={movie._id} className="hover:bg-white/[0.02]">
-                  <td className="px-5 py-3 text-white font-medium">{movie.title}</td>
+                  <td className="px-5 py-3 text-white font-medium">
+                    <div className="flex items-center gap-3">
+                      {movie.posterUrl ? (
+                        <img
+                          src={movie.posterUrl}
+                          alt={movie.title}
+                          className="h-10 w-7 rounded object-cover border border-white/10 shrink-0"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="h-10 w-7 rounded bg-white/5 flex items-center justify-center shrink-0">
+                          <Film size={12} className="text-gray-600" />
+                        </div>
+                      )}
+                      {movie.title}
+                    </div>
+                  </td>
                   <td className="px-5 py-3 text-gray-400">
                     {movie.genres && movie.genres.length > 0 ? movie.genres.join(", ") : "—"}
                   </td>
@@ -186,13 +212,22 @@ export default function Movies() {
                   </td>
                   <td className="px-5 py-3 text-gray-400">{movie.censorRating}</td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleDeactivate(movie._id)}
-                      className="text-gray-500 hover:text-red-400 transition-colors"
-                      title="Deactivate"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => setEditingMovie(movie)}
+                        className="text-gray-500 hover:text-gray-200 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeactivate(movie._id)}
+                        className="text-gray-500 hover:text-red-400 transition-colors"
+                        title="Deactivate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -202,31 +237,50 @@ export default function Movies() {
       </div>
 
       {showForm && (
-        <AddMovieModal
+        <MovieFormModal
           onClose={() => setShowForm(false)}
-          onCreated={(movie) => {
+          onSaved={(movie) => {
             setMovies((prev) => [movie, ...prev]);
             setShowForm(false);
+          }}
+        />
+      )}
+
+      {editingMovie && (
+        <MovieFormModal
+          movie={editingMovie}
+          onClose={() => setEditingMovie(null)}
+          onSaved={(movie) => {
+            setMovies((prev) => prev.map((m) => (m._id === movie._id ? movie : m)));
+            setEditingMovie(null);
           }}
         />
       )}
     </div>
   );
 }
-function AddMovieModal({
+function MovieFormModal({
+  movie,
   onClose,
-  onCreated,
+  onSaved,
 }: {
+  movie?: Movie;
   onClose: () => void;
-  onCreated: (movie: Movie) => void;
+  onSaved: (movie: Movie) => void;
 }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [language, setLanguage] = useState("");
-  const [genresInput, setGenresInput] = useState("");
-  const [durationMins, setDurationMins] = useState("");
-  const [releaseDate, setReleaseDate] = useState("");
-  const [censorRating, setCensorRating] = useState<"U" | "U/A" | "A" | "S">("U/A");
+  const isEdit = Boolean(movie);
+  const [title, setTitle] = useState(movie?.title ?? "");
+  const [description, setDescription] = useState(movie?.description ?? "");
+  const [posterUrl, setPosterUrl] = useState(movie?.posterUrl ?? "");
+  const [language, setLanguage] = useState(movie?.language ?? "");
+  const [genresInput, setGenresInput] = useState(movie?.genres?.join(", ") ?? "");
+  const [durationMins, setDurationMins] = useState(movie ? String(movie.durationMins) : "");
+  const [releaseDate, setReleaseDate] = useState(
+    movie ? movie.releaseDate.slice(0, 10) : ""
+  );
+  const [censorRating, setCensorRating] = useState<"U" | "U/A" | "A" | "S">(
+    movie?.censorRating ?? "U/A"
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -249,20 +303,25 @@ function AddMovieModal({
         .map((g) => g.trim())
         .filter(Boolean);
 
-      const res = await createMovie({
+      const payload = {
         title,
         description,
+        posterUrl: posterUrl || undefined,
         language,
         genres,
         durationMins: Number(durationMins),
         releaseDate,
         censorRating,
-        cast: [],
-      });
-      onCreated(res.movie);
+        cast: movie?.cast ?? [],
+      };
+
+      const res = isEdit
+        ? await updateMovie(movie!._id, payload)
+        : await createMovie(payload);
+      onSaved(res.movie);
     } catch (err: any) {
       // Displays exact backend validation error message
-      setError(err instanceof ApiError ? err.message : "Failed to create movie");
+      setError(err instanceof ApiError ? err.message : `Failed to ${isEdit ? "update" : "create"} movie`);
     } finally {
       setSubmitting(false);
     }
@@ -272,7 +331,7 @@ function AddMovieModal({
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-[#12151c] border border-white/10 rounded-xl w-full max-w-md">
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <h2 className="font-medium text-white">Add Movie</h2>
+          <h2 className="font-medium text-white">{isEdit ? "Edit Movie" : "Add Movie"}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
             <X size={18} />
           </button>
@@ -295,6 +354,27 @@ function AddMovieModal({
               rows={3}
             />
           </Field>
+          <Field label="Poster URL">
+            <input
+              type="url"
+              value={posterUrl}
+              onChange={(e) => setPosterUrl(e.target.value)}
+              placeholder="https://example.com/poster.jpg"
+              className={inputCls}
+            />
+          </Field>
+          {posterUrl && (
+            <div className="flex justify-center">
+              <img
+                src={posterUrl}
+                alt="Poster preview"
+                className="h-32 w-auto rounded-lg border border-white/10 object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <Field label="Language">
               <input
@@ -351,7 +431,7 @@ function AddMovieModal({
             disabled={submitting}
             className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
           >
-            {submitting ? "Saving..." : "Save Movie"}
+            {submitting ? "Saving..." : isEdit ? "Update Movie" : "Save Movie"}
           </button>
         </form>
       </div>

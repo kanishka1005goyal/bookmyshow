@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Clock3, Plus, Trash2, X } from "lucide-react";
+import { Clock3, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   getShows,
   createShow,
+  updateShow,
   deleteShow,
   getMovies,
   getTheatres,
@@ -21,11 +22,17 @@ function refName(ref: { _id: string; title?: string; name?: string } | string, f
   return ref.title || ref.name || fallback;
 }
 
+// Extract just the id, whether the ref is populated or a plain string.
+function refId(ref: { _id: string } | string): string {
+  return typeof ref === "string" ? ref : ref._id;
+}
+
 export default function Shows() {
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingShow, setEditingShow] = useState<Show | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -116,13 +123,22 @@ export default function Shows() {
                   <td className="px-5 py-3 text-gray-400">{show.format}</td>
                   <td className="px-5 py-3 text-gray-400">₹{show.basePrice}</td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleDeactivate(show._id)}
-                      className="text-gray-500 hover:text-red-400 transition-colors"
-                      title="Deactivate"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center justify-end gap-3">
+                      <button
+                        onClick={() => setEditingShow(show)}
+                        className="text-gray-500 hover:text-gray-200 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeactivate(show._id)}
+                        className="text-gray-500 hover:text-red-400 transition-colors"
+                        title="Deactivate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -132,11 +148,22 @@ export default function Shows() {
       </div>
 
       {showForm && (
-        <AddShowModal
+        <ShowFormModal
           onClose={() => setShowForm(false)}
-          onCreated={() => {
+          onSaved={() => {
             setShowForm(false);
             load(); // re-fetch so the new show comes back populated
+          }}
+        />
+      )}
+
+      {editingShow && (
+        <ShowFormModal
+          show={editingShow}
+          onClose={() => setEditingShow(null)}
+          onSaved={() => {
+            setEditingShow(null);
+            load(); // re-fetch so the updated show comes back populated
           }}
         />
       )}
@@ -144,19 +171,38 @@ export default function Shows() {
   );
 }
 
-function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+// Converts an ISO datetime string to the "YYYY-MM-DDTHH:mm" format
+// the <input type="datetime-local"> element expects, in local time.
+function toLocalInput(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
+    d.getMinutes()
+  )}`;
+}
+
+function ShowFormModal({
+  show,
+  onClose,
+  onSaved,
+}: {
+  show?: Show;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const isEdit = Boolean(show);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [theatres, setTheatres] = useState<Theatre[]>([]);
   const [screens, setScreens] = useState<Screen[]>([]);
 
-  const [movieId, setMovieId] = useState("");
-  const [theatreId, setTheatreId] = useState("");
-  const [screenId, setScreenId] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [language, setLanguage] = useState("");
-  const [format, setFormat] = useState<Show["format"]>("2D");
-  const [basePrice, setBasePrice] = useState("");
+  const [movieId, setMovieId] = useState(show ? refId(show.movieId) : "");
+  const [theatreId, setTheatreId] = useState(show ? refId(show.theatreId) : "");
+  const [screenId, setScreenId] = useState(show ? refId(show.screenId) : "");
+  const [startTime, setStartTime] = useState(show ? toLocalInput(show.startTime) : "");
+  const [endTime, setEndTime] = useState(show ? toLocalInput(show.endTime) : "");
+  const [language, setLanguage] = useState(show?.language ?? "");
+  const [format, setFormat] = useState<Show["format"]>(show?.format ?? "2D");
+  const [basePrice, setBasePrice] = useState(show ? String(show.basePrice) : "");
 
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -168,8 +214,10 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
       .then(([movieRes, theatreRes]) => {
         setMovies(movieRes.movies);
         setTheatres(theatreRes.theatres);
-        if (movieRes.movies.length > 0) setMovieId(movieRes.movies[0]._id);
-        if (theatreRes.theatres.length > 0) setTheatreId(theatreRes.theatres[0]._id);
+        if (!isEdit) {
+          if (movieRes.movies.length > 0) setMovieId(movieRes.movies[0]._id);
+          if (theatreRes.theatres.length > 0) setTheatreId(theatreRes.theatres[0]._id);
+        }
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load options"))
       .finally(() => setLoadingOptions(false));
@@ -181,7 +229,11 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
     getScreensByTheatre(theatreId)
       .then((res) => {
         setScreens(res.screens);
-        setScreenId(res.screens[0]?._id || "");
+        // Keep the show's current screen if it's still in this theatre's
+        // list (edit mode, unchanged theatre); otherwise default to the first.
+        setScreenId((prev) =>
+          res.screens.some((s) => s._id === prev) ? prev : res.screens[0]?._id || ""
+        );
       })
       .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load screens"));
   }, [theatreId]);
@@ -191,7 +243,7 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
     setSubmitting(true);
     setError(null);
     try {
-      await createShow({
+      const payload = {
         movieId,
         theatreId,
         screenId,
@@ -200,10 +252,15 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
         language,
         format,
         basePrice: Number(basePrice),
-      });
-      onCreated();
+      };
+      if (isEdit) {
+        await updateShow(show!._id, payload);
+      } else {
+        await createShow(payload);
+      }
+      onSaved();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to create show");
+      setError(err instanceof ApiError ? err.message : `Failed to ${isEdit ? "update" : "create"} show`);
     } finally {
       setSubmitting(false);
     }
@@ -213,7 +270,7 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
       <div className="bg-[#12151c] border border-white/10 rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-          <h2 className="font-medium text-white">Add Show</h2>
+          <h2 className="font-medium text-white">{isEdit ? "Edit Show" : "Add Show"}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
             <X size={18} />
           </button>
@@ -316,7 +373,7 @@ function AddShowModal({ onClose, onCreated }: { onClose: () => void; onCreated: 
               disabled={submitting || screens.length === 0}
               className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
             >
-              {submitting ? "Saving..." : "Save Show"}
+              {submitting ? "Saving..." : isEdit ? "Update Show" : "Save Show"}
             </button>
           </form>
         )}
