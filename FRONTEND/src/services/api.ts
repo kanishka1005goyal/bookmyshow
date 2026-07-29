@@ -1,20 +1,56 @@
 import mockData from '../data/mockData.json';
+const DELAY = 1500;
+// FRONTEND/src/services/api.ts
 
-// Increase the delay to 1500ms (1.5 seconds) so the loading state is obvious!
-const DELAY = 1500; 
+// Since your backend .env showed PORT=5000, your base URL will be:
+const API_BASE_URL = "http://localhost:5000/api"; 
 
 export const api = {
-  // 1. Get all recommended movies
-  getRecommendedMovies: () => {
-    console.log("🌐 [MOCK API] GET /api/movies/recommended - Request sent...");
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("✅ [MOCK API] 200 OK - Returned recommended movies");
-        resolve(mockData.recommendedMovies);
-      }, DELAY);
-    });
+  // 1. Get all movies from the live database
+  getRecommendedMovies: async () => {
+    try {
+      console.log("🌐 [REAL API] GET fetching movies from backend...");
+      
+      // Make the actual network request to your backend
+      const response = await fetch(`${API_BASE_URL}/movies`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Convert the backend response to JSON
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned movies:", data);
+      
+      return data.movies || []; 
+      
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return []; // Return an empty array so your frontend doesn't crash if the server is down
+    }
   },
 
+  // Add this inside the export const api = { ... } block
+  getMovieById: async (id: string) => {
+    try {
+      console.log(`🌐 [REAL API] GET fetching movie details for ID: ${id}...`);
+      const response = await fetch(`${API_BASE_URL}/movies/${id}`); 
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("✅ [REAL API] Success - Returned movie details:", data);
+      
+      // The backend will return a single movie object, so we return it directly
+      return data.movie || data.data || data;; 
+      
+    } catch (error) {
+      console.error("❌ API Fetch Error:", error);
+      return null; 
+    }
+  },
   // 2. Get all premiere movies
   getPremiereMovies: () => {
     console.log("🌐 [MOCK API] GET /api/movies/premieres - Request sent...");
